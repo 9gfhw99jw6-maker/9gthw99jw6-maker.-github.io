@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <meta name="description" content="Qhma Bot - あなたのDiscordサーバーをさらに便利で楽しくする専用Botです。ワンクリックで簡単に追加できます。">
+    <meta name="keywords" content="Discord, Bot, Qhma Bot, ディスコード, ボット, サーバー管理">
+    <meta name="author" content="Qhma Bot Developer">
+    
+    <meta property="og:title" content="Qhma Bot - あなたのDiscordサーバーに追加しよう">
+    <meta property="og:description" content="Qhma BotをDiscordサーバーに追加して、新しい体験を始めましょう。">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://discord.com/oauth2/authorize?client_id=1519992058159431712">
+    <meta property="og:site_name" content="Qhma Bot">
+    
+    <title>Qhma Bot | Discordに追加</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+
+    <style>
+        /* =========================================
+           1. リセット & 基本設定 (ダークモード専用)
+           ========================================= */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            /* スクロールバーを非表示にする設定 */
+            overflow: hidden; 
+            background-color: #050505;
+            color: #ffffff;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        /* =========================================
+           2. 背景エフェクト (グリッド・光・ぼかし)
+           ========================================= */
+        
+        /* 背面のグリッド線 */
+        .bg-grid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(255, 106, 0, 0.07) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 106, 0, 0.07) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: 1;
+        }
+
+        /* ゆっくり動く光のエフェクト（ブラー） */
+        .light-blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.4;
+            z-index: 2;
+            animation: float 15s infinite alternate ease-in-out;
+        }
+
+        .blob-1 {
+            width: 400px;
+            height: 400px;
+            background: #ff6a00;
+            top: -100px;
+            left: -100px;
+            animation-delay: 0s;
+        }
+
+        .blob-2 {
+            width: 300px;
+            height: 300px;
+            background: #ff8c00;
+            bottom: -50px;
+            right: -50px;
+            animation-delay: -5s;
+        }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(50px, 50px) scale(1.1); }
+            100% { transform: translate(-30px, 30px) scale(0.9); }
+        }
+
+        /* =========================================
+           3. 読み込みアニメーション (ローダー)
+           ========================================= */
+        #loader {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #050505;
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.8s ease;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255, 106, 0, 0.2);
+            border-top-color: #ff6a00;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            box-shadow: 0 0 20px rgba(255, 106, 0, 0.4);
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* =========================================
+           4. メインコンテンツ (ガラス風デザイン・アニメーション)
+           ========================================= */
+        #app {
+            position: relative;
+            z-index: 10;
+            width: 90%;
+            max-width: 500px;
+            opacity: 0; /* 初期状態は非表示（フェードイン用） */
+            transform: translateY(20px);
+            transition: opacity 1.2s ease, transform 1.2s ease;
+        }
+
+        #app.loaded {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Glassmorphism（ガラス風）カード */
+        .glass-card {
+            background: rgba(20, 20, 20, 0.5);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 106, 0, 0.3);
+            border-radius: 24px;
+            padding: 50px 30px;
+            text-align: center;
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.8),
+                inset 0 0 20px rgba(255, 106, 0, 0.05);
+        }
+
+        /* 犬アイコンコンテナ */
+        .icon-container {
+            margin-bottom: 20px;
+            display: inline-block;
+            filter: drop-shadow(0 0 15px rgba(255, 106, 0, 0.6));
+        }
+
+        /* タイトル・サブタイトル */
+        .title {
+            font-size: 2.8rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+            color: #fff;
+            text-shadow: 
+                0 0 10px rgba(255, 106, 0, 0.8),
+                0 0 20px rgba(255, 106, 0, 0.4);
+        }
+
+        .subtitle {
+            font-size: 1rem;
+            font-weight: 400;
+            color: #cccccc;
+            margin-bottom: 40px;
+        }
+
+        /* =========================================
+           5. ボタンデザイン (ホバー時のネオン発光・拡大)
+           ========================================= */
+        .btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #ff8c00, #ff5e00);
+            color: #000000;
+            font-size: 1.2rem;
+            font-weight: 800;
+            text-decoration: none;
+            padding: 18px 40px;
+            border-radius: 50px;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative;
+            overflow: hidden;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 106, 0, 0.3);
+        }
+
+        /* ボタン内のハイライト（高級感） */
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 50%; height: 100%;
+            background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0) 100%);
+            transform: skewX(-25deg);
+            transition: all 0.5s ease;
+        }
+
+        .btn:hover {
+            transform: scale(1.05) translateY(-2px);
+            box-shadow: 
+                0 10px 25px rgba(255, 106, 0, 0.5),
+                0 0 30px rgba(255, 106, 0, 0.8);
+            color: #000;
+        }
+
+        .btn:hover::before {
+            left: 200%;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+            box-shadow: 0 2px 10px rgba(255, 106, 0, 0.4);
+        }
+
+        /* スマホ向けレスポンシブ調整 */
+        @media (max-width: 480px) {
+            .title { font-size: 2.2rem; }
+            .subtitle { font-size: 0.9rem; }
+            .glass-card { padding: 40px 20px; }
+            .btn { font-size: 1rem; padding: 15px 30px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-grid"></div>
+    <div class="light-blob blob-1"></div>
+    <div class="light-blob blob-2"></div>
+
+    <div id="loader">
+        <div class="spinner"></div>
+    </div>
+
+    <div id="app">
+        <div class="glass-card">
+            
+            <div class="icon-container" id="dog-icon-container">
+                </div>
+
+            <h1 class="title">Qhma Bot</h1>
+            <p class="subtitle">あなたのDiscordサーバーに追加しよう</p>
+
+            <a href="https://discord.com/oauth2/authorize?client_id=1519992058159431712" class="btn">
+                サーバーに追加
+            </a>
+            
+        </div>
+    </div>
+
+    <script>
+        // 犬のSVGデータ（ネオンオレンジ、幾何学的なモダンデザイン）
+        const dogSvgData = `
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="90" height="90">
+                <defs>
+                    <filter id="neon-glow" x="-50%" y="-50%" width="200%" height="200%">
+                        <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                        <feMerge>
+                            <feMergeNode in="coloredBlur"/>
+                            <feMergeNode in="SourceGraphic"/>
+                        </feMerge>
+                    </filter>
+                </defs>
+                <g stroke="#ff8c00" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round" filter="url(#neon-glow)">
+                    <path d="M 25,45 L 15,15 L 40,35 L 60,35 L 85,15 L 75,45 C 85,55 85,75 70,85 L 50,90 L 30,85 C 15,75 15,55 25,45 Z" />
+                    <circle cx="35" cy="55" r="4" fill="#ff8c00" stroke="none" />
+                    <circle cx="65" cy="55" r="4" fill="#ff8c00" stroke="none" />
+                    <path d="M 45,70 Q 50,75 55,70" />
+                    <circle cx="50" cy="65" r="2.5" fill="#ff8c00" stroke="none" />
+                </g>
+            </svg>
+        `;
+
+        document.addEventListener("DOMContentLoaded", () => {
+            // 1. 犬のアイコンをタイトル上に挿入
+            document.getElementById('dog-icon-container').innerHTML = dogSvgData;
+
+            // 2. faviconをSVGから自動生成して<head>に挿入
+            // SVG文字列をBase64にエンコードしてData URIを作成
+            const encodedSvg = btoa(dogSvgData);
+            const faviconLink = document.createElement('link');
+            faviconLink.rel = 'icon';
+            faviconLink.type = 'image/svg+xml';
+            faviconLink.href = 'data:image/svg+xml;base64,' + encodedSvg;
+            document.head.appendChild(faviconLink);
+        });
+
+        // 3. ページ読み込み完了時のアニメーション制御
+        window.addEventListener('load', () => {
+            const loader = document.getElementById('loader');
+            const app = document.getElementById('app');
+
+            // 少しだけ待機してローディング演出を見せる（演出用）
+            setTimeout(() => {
+                // ローダーをフェードアウト
+                loader.style.opacity = '0';
+                
+                setTimeout(() => {
+                    // ローダーをDOMから非表示に
+                    loader.style.display = 'none';
+                    // メインコンテンツをフェードイン
+                    app.classList.add('loaded');
+                }, 800); // ローダーのフェードアウトを待つ時間
+                
+            }, 500); // 最小ローディング時間
+        });
+    </script>
+</body>
+</html>
